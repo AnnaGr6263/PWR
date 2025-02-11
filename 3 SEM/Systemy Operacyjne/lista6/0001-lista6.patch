@@ -1,0 +1,399 @@
+From e9eb2f12f2379c5c302c75af636a6faa71cdc050 Mon Sep 17 00:00:00 2001
+From: Anna <annagr6263@gmail.com>
+Date: Sun, 12 Jan 2025 20:15:45 +0100
+Subject: [PATCH] lista6
+
+---
+ Makefile   | 50 ++++++++++++++++++++++----------------------------
+ defs.h     |  3 +++
+ exec.c     |  5 +++++
+ proc.c     | 15 +++++++++++++++
+ syscall.c  |  4 ++++
+ syscall.h  |  3 +++
+ sysproc.c  |  9 +++++++++
+ test_mem.c | 30 ++++++++++++++++++++++++++++++
+ testvm.c   | 25 +++++++++++++++++++++++++
+ user.h     |  4 ++++
+ usys.S     |  3 +++
+ vm.c       | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 12 files changed, 167 insertions(+), 28 deletions(-)
+ create mode 100644 test_mem.c
+ create mode 100644 testvm.c
+
+diff --git a/Makefile b/Makefile
+index 09d790c..d596935 100644
+--- a/Makefile
++++ b/Makefile
+@@ -34,20 +34,21 @@ OBJS = \
+ # Using native tools (e.g., on X86 Linux)
+ #TOOLPREFIX = 
+ 
++# Try to infer the correct TOOLPREFIX if not set
+ # Try to infer the correct TOOLPREFIX if not set
+ ifndef TOOLPREFIX
+-TOOLPREFIX := $(shell if i386-jos-elf-objdump -i 2>&1 | grep '^elf32-i386$$' >/dev/null 2>&1; \
+-	then echo 'i386-jos-elf-'; \
+-	elif objdump -i 2>&1 | grep 'elf32-i386' >/dev/null 2>&1; \
+-	then echo ''; \
+-	else echo "***" 1>&2; \
+-	echo "*** Error: Couldn't find an i386-*-elf version of GCC/binutils." 1>&2; \
+-	echo "*** Is the directory with i386-jos-elf-gcc in your PATH?" 1>&2; \
+-	echo "*** If your i386-*-elf toolchain is installed with a command" 1>&2; \
+-	echo "*** prefix other than 'i386-jos-elf-', set your TOOLPREFIX" 1>&2; \
+-	echo "*** environment variable to that prefix and run 'make' again." 1>&2; \
+-	echo "*** To turn off this error, run 'gmake TOOLPREFIX= ...'." 1>&2; \
+-	echo "***" 1>&2; exit 1; fi)
++TOOLPREFIX := $(shell if i386-jos-elf-objdump -i 2>&1 | grep '^elf32-i386$$' >/dev/null; \
++        then echo 'i386-jos-elf-'; \
++        elif objdump -i 2>&1 | grep 'elf32-i386' >/dev/null 2>&1; \
++        then echo ''; \
++        else echo "***" 1>&2; \
++        echo "*** Error: Couldn't find an i386-*-elf version of GCC/binutils." 1>&2; \
++        echo "*** Is the directory with i386-jos-elf-gcc in your PATH?" 1>&2; \
++        echo "*** If your i386-*-elf toolchain is installed with a command" 1>&2; \
++        echo "*** prefix other than 'i386-jos-elf-', set your TOOLPREFIX" 1>&2; \
++        echo "*** environment variable to that prefix and run 'make' again." 1>&2; \
++        echo "*** To turn off this error, run 'gmake TOOLPREFIX= ...'." 1>&2; \
++        echo "***" 1>&2; exit 1; fi)
+ endif
+ 
+ # If the makefile can't find QEMU, specify its path here
+@@ -55,28 +56,16 @@ endif
+ 
+ # Try to infer the correct QEMU
+ ifndef QEMU
+-QEMU = $(shell if which qemu > /dev/null; \
+-	then echo qemu; exit; \
+-	elif which qemu-system-i386 > /dev/null; \
+-	then echo qemu-system-i386; exit; \
+-	elif which qemu-system-x86_64 > /dev/null; \
+-	then echo qemu-system-x86_64; exit; \
+-	else \
+-	qemu=/Applications/Q.app/Contents/MacOS/i386-softmmu.app/Contents/MacOS/i386-softmmu; \
+-	if test -x $$qemu; then echo $$qemu; exit; fi; fi; \
+-	echo "***" 1>&2; \
+-	echo "*** Error: Couldn't find a working QEMU executable." 1>&2; \
+-	echo "*** Is the directory containing the qemu binary in your PATH" 1>&2; \
+-	echo "*** or have you tried setting the QEMU variable in Makefile?" 1>&2; \
+-	echo "***" 1>&2; exit 1)
++QEMU = qemu-system-x86_64
+ endif
+ 
++
+ CC = $(TOOLPREFIX)gcc
+ AS = $(TOOLPREFIX)gas
+ LD = $(TOOLPREFIX)ld
+ OBJCOPY = $(TOOLPREFIX)objcopy
+ OBJDUMP = $(TOOLPREFIX)objdump
+-CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -O2 -Wall -MD -ggdb -m32 -Werror -fno-omit-frame-pointer
++CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -O2 -Wall -MD -mno-sse -ggdb -m32 -fno-omit-frame-pointer
+ CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
+ ASFLAGS = -m32 -gdwarf-2 -Wa,-divide
+ # FreeBSD ld wants ``elf_i386_fbsd''
+@@ -116,6 +105,7 @@ entryother: entryother.S
+ 
+ initcode: initcode.S
+ 	$(CC) $(CFLAGS) -nostdinc -I. -c initcode.S
++	$(OBJCOPY) --remove-section .note.gnu.property initcode.o
+ 	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o initcode.out initcode.o
+ 	$(OBJCOPY) -S -O binary initcode.out initcode
+ 	$(OBJDUMP) -S initcode.o > initcode.asm
+@@ -146,6 +136,7 @@ vectors.S: vectors.pl
+ ULIB = ulib.o usys.o printf.o umalloc.o
+ 
+ _%: %.o $(ULIB)
++	$(OBJCOPY) --remove-section .note.gnu.property ulib.o
+ 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+ 	$(OBJDUMP) -S $@ > $*.asm
+ 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
+@@ -172,6 +163,7 @@ UPROGS=\
+ 	_grep\
+ 	_init\
+ 	_kill\
++	_expr\
+ 	_ln\
+ 	_ls\
+ 	_mkdir\
+@@ -181,6 +173,8 @@ UPROGS=\
+ 	_usertests\
+ 	_wc\
+ 	_zombie\
++	_testvm\
++	_test_mem\
+ 
+ fs.img: mkfs README $(UPROGS)
+ 	./mkfs fs.img README $(UPROGS)
+@@ -250,7 +244,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
+ EXTRA=\
+ 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
+ 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
+-	printf.c umalloc.c\
++	printf.c umalloc.c testvm.c test_mem\
+ 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
+ 	.gdbinit.tmpl gdbutil\
+ 
+diff --git a/defs.h b/defs.h
+index 82fb982..60d0d25 100644
+--- a/defs.h
++++ b/defs.h
+@@ -185,6 +185,9 @@ void            switchuvm(struct proc*);
+ void            switchkvm(void);
+ int             copyout(pde_t*, uint, void*, uint);
+ void            clearpteu(pde_t *pgdir, char *uva);
++int             usedvp(void);
++int             usedpp(void);
++
+ 
+ // number of elements in fixed-size array
+ #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
+diff --git a/exec.c b/exec.c
+index b40134f..5f9cc51 100644
+--- a/exec.c
++++ b/exec.c
+@@ -96,6 +96,11 @@ exec(char *path, char **argv)
+   // Commit to the user image.
+   oldpgdir = curproc->pgdir;
+   curproc->pgdir = pgdir;
++
++  // Anna Gr
++  cprintf("Strony procesu w czasie EXEC [%s]:\n", curproc->name);
++  vmprint(curproc->pgdir);
++
+   curproc->sz = sz;
+   curproc->tf->eip = elf.entry;  // main
+   curproc->tf->esp = sp;
+diff --git a/proc.c b/proc.c
+index 806b1b1..682f9da 100644
+--- a/proc.c
++++ b/proc.c
+@@ -261,6 +261,10 @@ exit(void)
+     }
+   }
+ 
++  // Anna Gr ---- wypisz tabele stronicowania przed zakonczeniem procesu.
++  cprintf("Strony procesu w czasie EXIT [%s]:\n", curproc->name);
++  vmprint(curproc->pgdir);
++
+   // Jump into the scheduler, never to return.
+   curproc->state = ZOMBIE;
+   sched();
+@@ -532,3 +536,14 @@ procdump(void)
+     cprintf("\n");
+   }
+ }
++
++int usedvp(void) 
++{
++  struct proc *p = myproc();
++  if (!p) return -1; // Sprawdzenie, czy proces istnieje
++
++  // Liczba stron: rozmiar procesu w stronach + strona ochrony stosu
++  return (p->sz / PGSIZE) + 1;
++}
++
++
+diff --git a/syscall.c b/syscall.c
+index ee85261..050ab52 100644
+--- a/syscall.c
++++ b/syscall.c
+@@ -103,6 +103,8 @@ extern int sys_unlink(void);
+ extern int sys_wait(void);
+ extern int sys_write(void);
+ extern int sys_uptime(void);
++extern int sys_usedvp(void);
++extern int sys_usedpp(void);
+ 
+ static int (*syscalls[])(void) = {
+ [SYS_fork]    sys_fork,
+@@ -126,6 +128,8 @@ static int (*syscalls[])(void) = {
+ [SYS_link]    sys_link,
+ [SYS_mkdir]   sys_mkdir,
+ [SYS_close]   sys_close,
++[SYS_usedvp] sys_usedvp,
++[SYS_usedpp] sys_usedpp,
+ };
+ 
+ void
+diff --git a/syscall.h b/syscall.h
+index bc5f356..80727b6 100644
+--- a/syscall.h
++++ b/syscall.h
+@@ -20,3 +20,6 @@
+ #define SYS_link   19
+ #define SYS_mkdir  20
+ #define SYS_close  21
++
++#define SYS_usedvp 23
++#define SYS_usedpp 24
+diff --git a/sysproc.c b/sysproc.c
+index 0686d29..4ecc7a0 100644
+--- a/sysproc.c
++++ b/sysproc.c
+@@ -89,3 +89,12 @@ sys_uptime(void)
+   release(&tickslock);
+   return xticks;
+ }
++
++int sys_usedvp(void) {
++    return usedvp();
++}
++
++int sys_usedpp(void) {
++    return usedpp();
++}
++
+diff --git a/test_mem.c b/test_mem.c
+new file mode 100644
+index 0000000..662e825
+--- /dev/null
++++ b/test_mem.c
+@@ -0,0 +1,30 @@
++#include "types.h"
++#include "stat.h"
++#include "user.h"
++
++int main(int argc, char *argv[]) {
++    if (argc != 2) {
++        printf(1, "Usage: test_mem <num_pages>\n");
++        exit();
++    }
++
++    int num_pages = atoi(argv[1]);
++    int total_memory = num_pages * 4096;
++
++    int used_virtual = usedvp();
++    int used_physical = usedpp();
++
++    printf(1, "Virtual Pages: %d\n", used_virtual);
++    printf(1, "Physical Pages: %d\n", used_physical);
++
++    sbrk(total_memory); // Przydzielenie pamieci
++
++    used_virtual = usedvp();
++    used_physical = usedpp();
++
++    printf(1, "After allocating %d pages (%d bytes):\n", num_pages, total_memory);
++    printf(1, "Virtual Pages: %d\n", used_virtual);
++    printf(1, "Physical Pages: %d\n", used_physical);
++
++    exit();
++}
+diff --git a/testvm.c b/testvm.c
+new file mode 100644
+index 0000000..01f7f6d
+--- /dev/null
++++ b/testvm.c
+@@ -0,0 +1,25 @@
++#include "types.h"
++#include "stat.h"
++#include "user.h"
++
++#define PAGE_SIZE 4096
++
++int main() 
++{
++    printf(1, "Alokuje 5 stron pamieci przy uzyciu sbrk...\n");
++
++    for (int i = 0; i < 5; i++) 
++    {
++        if (sbrk(PAGE_SIZE) == (void *)-1) 
++        {
++            printf(1, "Blad przy alokacji strony %d\n", i);
++            exit();
++        }
++        printf(1, "Zaalokowano strone %d\n", i);
++    }
++
++    printf(1, "Alokacja zakonczona. Koncze dzialanie programu...\n");
++    exit();
++    return 0;
++}
++
+diff --git a/user.h b/user.h
+index 4f99c52..401d07a 100644
+--- a/user.h
++++ b/user.h
+@@ -1,3 +1,5 @@
++#include "types.h"
++
+ struct stat;
+ struct rtcdate;
+ 
+@@ -23,6 +25,8 @@ int getpid(void);
+ char* sbrk(int);
+ int sleep(int);
+ int uptime(void);
++int usedvp(void);
++int usedpp(void);
+ 
+ // ulib.c
+ int stat(const char*, struct stat*);
+diff --git a/usys.S b/usys.S
+index 8bfd8a1..7b08352 100644
+--- a/usys.S
++++ b/usys.S
+@@ -29,3 +29,6 @@ SYSCALL(getpid)
+ SYSCALL(sbrk)
+ SYSCALL(sleep)
+ SYSCALL(uptime)
++SYSCALL(usedvp)
++SYSCALL(usedpp)
++
+diff --git a/vm.c b/vm.c
+index 7134cff..40a2368 100644
+--- a/vm.c
++++ b/vm.c
+@@ -387,6 +387,50 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
+ 
+ //PAGEBREAK!
+ // Blank page.
++
++void vmprint(pde_t *pgdir) {
++    cprintf("pgdir %p\n", pgdir); // Wyswietlenie adresu katalogu stron (pgdir)
++
++    for (int i = 0; i < 512; i++) { // Iterujemy tylko po pierwszych 512 wpisach (obszar uzytkownika)
++        if (pgdir[i] & PTE_P) { // Sprawdzamy, czy wpis w katalogu stron (PDE) jest aktywny
++            uint pa = PTE_ADDR(pgdir[i]); // Pobieramy adres fizyczny tabeli stron
++            cprintf(".. %d: pde %p pa %p\n", i, pgdir[i], pa); // Wyswietlamy szczegoly wpisu PDE
++
++            pte_t *pt = (pte_t *)P2V(pa); // Przeksztalcamy adres fizyczny na wirtualny i uzyskujemy tabele stron
++            for (int j = 0; j < 1024; j++) { // Iteracja przez 1024 wpisy w tabeli stron
++                if (pt[j] & PTE_P) { // Sprawdzamy, czy wpis w tabeli stron (PTE) jest aktywny
++                    uint pte_pa = PTE_ADDR(pt[j]); // Pobieramy adres fizyczny zamapowanej strony
++                    cprintf(".. .. %d: pte %p pa %p\n", j, pt[j], pte_pa); // Wyswietlamy szczegoly wpisu PTE
++                }
++            }
++        }
++    }
++}
++
++
++int usedpp(void) 
++{
++  struct proc *p = myproc();
++  pte_t *pte;
++  uint va; // Virtual address
++  int pages = 0;
++
++  // Iteracja przez tabelę stron procesu
++  for (va = 0; va < p->sz; va += PGSIZE) 
++  {
++    pte = walkpgdir(p->pgdir, (void*)va, 0); // Pobierz wpis PTE dla adresu `va`
++
++    // Sprawdź, czy PTE istnieje i jest obecne w pamięci fizycznej
++    if (pte != 0 && (*pte & PTE_P)) 
++    {
++      pages++;
++    }
++  }
++
++  return pages;
++}
++
++
+ //PAGEBREAK!
+ // Blank page.
+ //PAGEBREAK!
+-- 
+2.25.1
+
