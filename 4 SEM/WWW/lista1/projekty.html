@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>My Projects</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="o-mnie.html">About Me</a></li>
+                    <li><a href="projekty.html">Projects</a></li>
+                    <li><a href="kontakt.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="container">
+        <section class="projects">
+            <h2>Selected Projects</h2>
+            <div class="project-grid">
+                <article class="project-card">
+                    <h3>My Own Shell</h3>
+                    <p>A shell program in C that handles basic commands.</p>
+                    <a href="#projekt1" class="btn">Read more</a>
+                </article>
+                <article class="project-card">
+                    <h3>Prime Number Generator in Assembly</h3>
+                    <p>A program in x86 assembly that generates prime numbers less than 100,000.</p>
+                    <a href="#projekt2" class="btn">Read more</a>
+                </article>
+                <article class="project-card">
+                    <h3>Chinese Checkers Game</h3>
+                    <p>Project in Java with a client-server architecture, featuring two game variants.</p>
+                    <a href="#projekt3" class="btn">Read more</a>
+                </article>
+                <article class="project-card">
+                    <h3>System and Network Monitoring Tool</h3>
+                    <p>Bash script for real-time system and network monitoring with data visualization.</p>
+                    <a href="#projekt4" class="btn">Read more</a>
+                </article>
+                <article class="project-card">
+                    <h3>Monte Carlo Integration Simulator</h3>
+                    <p>Program using Monte Carlo simulation to estimate integrals and visualize results.</p>
+                    <a href="#projekt5" class="btn">Read more</a>
+                </article>
+                <article class="project-card">
+                    <h3>Process Monitor in Bash</h3>
+                    <p>Bash script for process monitoring using `/proc` data.</p>
+                    <a href="#projekt6" class="btn">Read more</a>
+                </article>
+            </div>
+        </section>
+        <section id="projekt1" class="project-details">
+            <h2>My Own Shell</h2>
+            <p>As part of a systems programming course, I developed a custom shell in C that mimics the functionality of a basic Unix shell. The shell, named <code>lsh</code> (Little Shell), supports executing external commands, handling built-in commands like <code>cd</code> and <code>exit</code>, managing input/output redirection (<code>&gt;</code>, <code>&lt;</code>, <code>2&gt;</code>), and processing pipelines (<code>|</code>). The shell also handles background processes and includes a custom signal handler for <code>SIGINT</code> (Ctrl-C) to ensure a smooth user experience. This project was an excellent opportunity to deepen my understanding of system calls, process management, and low-level programming in C.</p>
+            <p>The shell is built around a main loop that continuously reads user input, parses commands, and executes them. It uses <code>fork()</code> to create child processes for executing external commands and <code>execvp()</code> to replace the child process with the desired program. Built-in commands like <code>cd</code> and <code>exit</code> are handled directly within the shell. The shell also supports input/output redirection by manipulating file descriptors using <code>dup2()</code> and <code>open()</code>. Additionally, it implements pipelines by creating multiple processes and connecting their input/output using <code>pipe()</code>. The project demonstrates my ability to work with low-level system APIs and manage complex interactions between processes.</p>
+            <pre><code>
+// Function handling pipes (|)
+int lsh_execute_piped(char **args) {
+    int pipefd[2];
+    pid_t p1, p2;
+    char **cmd1, **cmd2;
+    int i = 0;
+
+    // Split the command into two parts before and after `|`
+    while (args[i] != NULL) {
+        if (strcmp(args[i], "|") == 0) {
+            args[i] = NULL;
+            cmd1 = args;          // First command
+            cmd2 = &args[i + 1];  // Second command
+            break;
+        }
+        i++;
+    }
+
+    if (pipe(pipefd) == -1) { // Create pipe
+        perror("lsh: pipe creation error");
+        return 1;
+    }
+
+    p1 = fork(); // Create first process
+    if (p1 == 0) {
+        dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe
+        close(pipefd[0]);
+        close(pipefd[1]);
+        lsh_handle_redirections(cmd1); // Handle redirections
+        if (execvp(cmd1[0], cmd1) == -1) {
+            perror("lsh");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    p2 = fork(); // Create second process
+    if (p2 == 0) {
+        dup2(pipefd[0], STDIN_FILENO); // Redirect stdin from pipe
+        close(pipefd[1]);
+        close(pipefd[0]);
+        lsh_handle_redirections(cmd2); // Handle redirections
+        if (execvp(cmd2[0], cmd2) == -1) {
+            perror("lsh");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    close(pipefd[0]);
+    close(pipefd[1]);
+    waitpid(p1, NULL, 0); 
+    waitpid(p2, NULL, 0); 
+
+    return 1; 
+}
+            </code></pre>
+        </section>
+        <section id="projekt2" class="project-details">
+            <h2>Prime Number Generator in x86 Assembly</h2>
+            <p>As part of a low-level programming course, I developed a program in x86 Assembly that generates and prints all prime numbers less than 100,000. The program is written in NASM (Netwide Assembler) and is designed to run on 32-bit Linux systems. It efficiently checks for prime numbers by iterating through potential divisors and uses a simple yet effective algorithm to determine primality. The program also includes a function to convert numbers into their ASCII representation for printing, demonstrating my ability to work with low-level memory manipulation and system calls. This project was a great opportunity to deepen my understanding of assembly language, CPU registers, and system-level programming.</p>
+            <p>The program starts by initializing the first prime number (2) and iterates through all numbers up to 100,000. For each number, it checks divisibility by all integers from 2 up to the square root of the number. If a number is found to be prime, it is converted to a string and printed to the standard output using the Linux <code>write</code> system call. The program terminates gracefully once it reaches the upper limit of 100,000. This project not only reinforced my knowledge of assembly language but also improved my problem-solving skills and attention to detail, as working in assembly requires precise control over memory and CPU resources.</p>
+            <pre><code>
+check_prime:
+; Checking if the number is divisible by the divisor
+cmp ecx, ebx                  ; Compare divisor with the current number
+je print_number               ; If divisor == number, the number is prime
+
+mov eax, ebx                  ; Load the current number (ebx) into eax
+xor edx, edx                 
+div ecx                     
+cmp edx, 0                    
+je not_prime                  ; If remainder = 0, the number is not prime
+
+inc ecx                     
+jmp check_prime               ; Repeat checking
+            </code></pre>
+        </section>
+        <section id="projekt3" class="project-details">
+            <h2>Chinese Checkers Game</h2>
+            <p>As part of a software engineering course at Wroclaw University of Science and Technology, I collaborated with a teammate to develop a Chinese Checkers game using a client-server architecture. The game supports 2, 3, 4, or 6 players and includes two distinct variants: Classic Chinese Checkers and Yin and Yang. The project was implemented in Java, leveraging JavaFX for the graphical user interface (GUI) to provide an interactive and visually appealing experience.</p>
+            <p>The game enforces all the rules of Chinese Checkers, including valid moves, jumps, and winning conditions. Additionally, the system supports bot players that can join the game, providing a single-player mode where the bot makes reasonably intelligent moves. The project also integrates the Spring framework to save game data in a database, allowing players to replay past games. This feature was implemented using Hibernate for object-relational mapping (ORM), ensuring efficient storage and retrieval of game states and moves.</p>
+            <p>The development process followed agile methodologies, with the project divided into three iterations. In the first iteration, we focused on building the core functionality, including the server-client communication, move validation, and a console-based interface. The second iteration introduced the GUI using JavaFX, along with unit tests written in JUnit to ensure code correctness. The final iteration added advanced features such as the bot player and database integration. Throughout the project, we applied key design patterns such as Mediator (to manage communication between components), Observer (to notify players of game updates), Singleton (for the server and database connection), and adhered to the Single Responsibility Principle (SRP) to ensure clean and maintainable code. The project also included comprehensive documentation generated using JavaDoc and a detailed class diagram to illustrate the application's structure.</p>
+            <pre><code>
+public boolean isValidMove() {
+    if (startField.getNeighbours().contains(endField)) {
+        return true;
+    } else if ((Math.abs(startField.getRow() - endField.getRow()) == 2 &amp;&amp; Math.abs(startField.getCol() - endField.getCol()) == 2) ||
+            (Math.abs(startField.getCol() - endField.getCol()) == 2 &amp;&amp; startField.getRow() == endField.getRow())) {
+        return canJumpOverPiece();
+    } else {
+        Set&lt;Field&gt; visitedFields = new HashSet&lt;&gt;();
+        return canMultiJump(startField, endField, visitedFields);
+    }
+}
+
+public void performMove() {
+    Piece piece = startField.getPiece(); 
+    String message = String.format("Move performed by %s: %dx%d -&gt; %dx%d",
+            piece.getColor(), 
+            startField.getRow(), startField.getCol(),
+            endField.getRow(), endField.getCol());
+    GameManager.getInstance().notifyObservers(message); 
+    guiMoves.updateMove(startField, endField);
+}
+            </code></pre>
+        </section>
+        <section id="projekt4" class="project-details">
+            <h2>System and Network Monitoring Tool in Bash</h2>
+            <p>I developed a real-time system and network monitoring tool using Bash scripting. This tool provides a comprehensive overview of system performance, including network traffic, CPU usage, memory usage, system load, battery status, and uptime. The script continuously monitors the specified network interface (<code>enp0s3</code> by default) and calculates real-time download/upload speeds, total data transferred, and average speeds. It also visualizes network traffic history using simple bar graphs and displays detailed system metrics such as CPU utilization per core, memory usage, and battery status. The tool is designed to be lightweight and efficient, making it ideal for monitoring system performance on Linux-based systems.</p>
+            <pre><code>
+draw_graph() {
+    local -n data=$1 
+    local label=$2 
+    echo "$label:"
+    
+    local max_value=$(printf "%s\n" "${data[@]}" | sort -nr | head -n1)
+    if (( max_value == 0 )); then
+        max_value=1  
+    fi
+    
+    local max_length=40 
+    
+    for value in "${data[@]}"; do
+        local bar_length=$(echo "scale=0; ($value * $max_length) / $max_value" | bc)
+        if (( bar_length == 0 &amp;&amp; value &gt; 0 )); then
+            bar_length=1 
+        fi
+        for ((i = 0; i &lt; bar_length; i++)); do
+            echo -n "*"
+        done
+        echo
+    done
+    echo
+}
+            </code></pre>
+        </section>
+        <section id="projekt5" class="project-details">
+            <h2>Monte Carlo Integration Simulator in Python</h2>
+            <p>I developed a Python program that uses the Monte Carlo method to estimate the area under various mathematical functions (e.g., cube root, sine, polynomial, and quarter circle). The program generates random points within a defined range, checks if they lie under the curve, and approximates the integral by calculating the ratio of points under the curve to the total number of points. The results are visualized using Matplotlib, showing the convergence of the estimated value to the true integral as the number of points increases. This project demonstrates my ability to implement numerical methods, work with mathematical functions, and create clear visualizations of complex data.</p>
+            <pre><code>
+class MonteCarloEstimator:
+    def __init__(self, func: Callable[[float], float], range_vals: Tuple[float, float], upper_bound: float):
+        """
+        Initialize the Monte Carlo estimator.
+        :param func: The function to integrate.
+        :param range_vals: The integration range (start, end).
+        :param upper_bound: The upper bound for generating random y-values.
+        """
+        self.func = func
+        self.range_vals = range_vals
+        self.upper_bound = upper_bound
+
+    def estimate_area(self, num_points: int) -&gt; float:
+        """Estimate the area under the curve using Monte Carlo simulation."""
+        points = self.generate_random_points(num_points)
+        points_below = self.count_points_below_curve(points)
+        rectangle_area = (self.range_vals[1] - self.range_vals[0]) * self.upper_bound
+        return (points_below / num_points) * rectangle_area
+
+    def generate_random_points(self, num_points: int) -&gt; List[Coordinate]:
+        """Generate random points within the defined range."""
+        generator = np.random.default_rng()
+        return [
+            Coordinate(
+                generator.uniform(self.range_vals[0], self.range_vals[1]),
+                generator.uniform(0, self.upper_bound)
+            ) for _ in range(num_points)
+        ]
+
+    def count_points_below_curve(self, coords: List[Coordinate]) -&gt; int:
+        """Count how many points lie below the curve."""
+        return sum(self.is_point_under_curve(coord) for coord in coords)
+
+    def is_point_under_curve(self, coord: Coordinate) -&gt; bool:
+        """Check if a point lies below the curve."""
+        return coord.y_value &lt;= self.func(coord.x_value)
+            </code></pre>
+        </section>
+        <section id="projekt6" class="project-details">
+            <h2>Process Monitor in Bash</h2>
+            <p>I developed a Bash script that extracts and displays detailed information about running processes from the <code>/proc</code> directory, including PID, process name, state, memory usage, open files, and more. The script organizes the data into a clear, formatted table, making it easy to analyze system processes. This project demonstrates my ability to work with system files, parse data, and create user-friendly tools for system monitoring.</p>
+            <pre><code>
+for pid in /proc/[0-9]*; do
+    pid="${pid##*/}"  
+    ppid=$(awk '/^PPid:/ {print $2}' /proc/$pid/status)
+    comm=$(awk '/^Name:/ {print $2}' /proc/$pid/status)
+    state=$(awk '/^State:/ {print $2}' /proc/$pid/status)
+    rss=$(awk '/^VmRSS:/ {print $2}' /proc/$pid/status)
+    echo -e "$ppid\t$pid\t$comm\t$state\t$rss"
+done | column -t -s $'\t'
+            </code></pre>
+        </section>
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Anna Gr</p>
+        </div>
+    </footer>
+</body>
+</html>
