@@ -1,83 +1,82 @@
-
 #include <iostream>
 
-// Struktura węzła listy jednokierunkowej
+// Structure of a singly linked list node
 struct Node {
     int data;
     Node* next;
 
-    // Konstruktor - 
+    // Constructor
     Node(int value) {
         data = value;
         next = nullptr;
     }
 };
 
-// Klasa implementujaca kolejke FIFO
+// Class implementing FIFO queue
 class Queue {
 private:
-    Node* head; // Wskaznik na poczatek kolejki
-    Node* tail; // Wskaznik na koniec kolejki
+    Node* head; // Pointer to the beginning of the queue
+    Node* tail; // Pointer to the end of the queue
 
 public:
-    // Konstruktor
+    // Constructor
     Queue() {
         head = nullptr;
         tail = nullptr;
     }
 
-    // Dodawanie elementu do kolejki (na koniec)
+    // Adding an element to the queue (at the end)
     void push(int value) {
-        Node* newNode = new Node(value);    // Tworzymy nowy wezel
+        Node* newNode = new Node(value);    // Create a new node
 
-        if(!tail) {     // jesli kolejka pusta
+        if(!tail) {     // if the queue is empty
             head = tail = newNode;
         } else {
             tail->next = newNode;
             tail = newNode;
         }
 
-        std::cout << "Dodano do kolejki: " << value << std::endl;
+        std::cout << "Added to queue: " << value << std::endl;
     }
 
-    // Usuniecie elementu z kolejki (z poczatku)
+    // Removing an element from the queue (from the beginning)
     void pop() {
-        if(!head) {     // Jesli kolejka jest pusta
-            std::cerr << "Błąd! Próba usunięcia elementu z pustej kolejki!" << std::endl;
+        if(!head) {     // If the queue is empty
+            std::cerr << "Error! Attempt to remove an element from an empty queue!" << std::endl;
             return;
         }
 
-        Node* temp = head;      // Wskaznik na pierwszy wezel
-        std::cout << "Usunięto z kolejki: " << head->data << std::endl;
+        Node* temp = head;      // Pointer to the first node
+        std::cout << "Removed from queue: " << head->data << std::endl;
 
         head = head->next;
         delete temp;
 
-        if (!head) {  // Jeśli kolejka jest teraz pusta
-            tail = nullptr;  // Zerujemy tail
+        if (!head) {  // If the queue is now empty
+            tail = nullptr;  // Reset tail
         }
     }
-    // Sprawdzenie, czy kolejka jest pusta
+    // Checking if the queue is empty
     bool isEmpty() {
         return head == nullptr;
     }
-    // Destruktor zwalniający pamięć
+    // Destructor freeing memory
     ~Queue() {
         while (!isEmpty()) {
-            pop();  // Usuwamy wszystkie elementy z kolejki
+            pop();  // Remove all elements from the queue
         }
     }
 };
 
 int main() {
-    Queue queue;  // Tworzymy kolejkę
+    Queue queue;  // Create a queue
 
-    // Dodajemy 50 elementów do kolejki
+    // Add 50 elements to the queue
     for (int i = 1; i <= 50; i++) {
         queue.push(i);
     }
 
-    // Pobieramy elementy z kolejki
+    // Remove elements from the queue
     while (!queue.isEmpty()) {
         queue.pop();
     }
