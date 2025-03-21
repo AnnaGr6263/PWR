@@ -31,16 +31,16 @@ header {
 
 header h1 {
     margin-bottom: 10px;
-    font-size: 3rem;
+    font-size: 2rem;
     text-align: center;
 }
 
 nav ul {
     list-style: none;
     display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
 nav ul li a {
@@ -56,25 +56,25 @@ nav ul li a:hover {
 
 main {
     flex: 1;
-    padding: 40px 0;
+    padding: 20px 0;
 }
 
 section {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 h2 {
     color: #011140;
-    margin-bottom: 20px;
-    font-size: 1.75rem;
-    text-align: left;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    text-align: center;
 }
 
 p {
-    font-size: 1.1rem;
-    line-height: 1.8;
+    font-size: 1rem;
+    line-height: 1.6;
     color: #444;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .btn {
@@ -86,7 +86,7 @@ p {
     border-radius: 5px;
     transition: background-color 0.3s ease;
     text-align: center;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .btn:hover {
@@ -96,25 +96,27 @@ p {
 /* Sekcja intro */
 .intro-content {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 40px;
+    gap: 20px;
 }
 
 .intro-text {
-    flex: 1;
     background-color: #FFFFFF;
-    padding: 30px;
+    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .intro-image {
-    flex: 0 0 250px;
+    order: -1;
+    margin-bottom: 20px;
 }
 
 .profile-img {
-    width: 250px;
-    height: 350px;
+    width: 100%;
+    max-width: 250px;
+    height: auto;
     border-radius: 10px;
     border: 5px solid #023859;
     object-fit: cover;
@@ -124,23 +126,24 @@ p {
 /* Sekcja "Moje projekty" */
 .projects-preview {
     background-color: #FFFFFF;
-    padding: 30px;
+    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .project-grid {
     display: grid;
-    gap: 20px;
+    gap: 15px;
 }
 
 .project-card {
     background-color: #FFFFFF;
-    padding: 20px;
+    padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
     text-align: center;
+    margin-bottom: 15px;
 }
 
 .project-card:hover {
@@ -155,7 +158,7 @@ p {
 
 .project-details {
     background-color: #FFFFFF;
-    padding: 30px;
+    padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     text-align: left;
@@ -164,8 +167,8 @@ p {
 pre {
     background-color: #252626;
     color: #F2F2F2;
-    padding: 15px;
-    border-radius: 15px;
+    padding: 10px;
+    border-radius: 10px;
     overflow-x: auto;
     text-align: left;
 }
@@ -173,14 +176,14 @@ pre {
 /* Sekcja zainteresowań informatycznych */
 .interests {
     background-color: #FFFFFF;
-    padding: 30px;
-    margin: 40px 0;
+    padding: 20px;
+    margin: 15px 0;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .interest-item {
-    padding: 20px;
+    padding: 15px;
     background-color: #F8F8F8;
     border-radius: 10px;
     border-left: 5px solid #105773;
@@ -194,24 +197,24 @@ pre {
 
 .interest-item h3 {
     color: #011140;
-    margin-bottom: 15px;
-    font-size: 1.5rem;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
 }
 
 .interest-item p {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .certificate-images {
     display: flex;
-    gap: 20px; /* Odstęp między zdjęciami */
-    justify-content: center; /* Wyśrodkowanie zdjęć */
-    align-items: center; /* Wyrównanie w pionie */
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
 }
 
 .certificate-images img {
-    width: 45%; /* Dostosuj szerokość zdjęć */
-    max-width: 100%; /* Zapobiega przekraczaniu szerokości */
+    width: 80%;
+    max-width: 100%;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -225,14 +228,14 @@ pre {
 /* Sekcja zainteresowań pozainformatycznych */
 .hobbies {
     background-color: #FFFFFF;
-    padding: 30px;
-    margin: 40px 0;
+    padding: 20px;
+    margin: 20px 0;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .hobby-item {
-    padding: 20px;
+    padding: 15px;
     background-color: #F8F8F8;
     border-radius: 10px;
     border-left: 5px solid #023859;
@@ -246,25 +249,25 @@ pre {
 
 .hobby-item h3 {
     color: #011140;
-    margin-bottom: 15px;
-    font-size: 1.5rem;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
 }
 
 .hobby-item p {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .hobby-images {
     display: grid;
-    gap: 15px;
-    grid-template-columns: repeat(4, minmax(150px, 1fr)); /* Szerokość kolumn */
+    gap: 10px;
+    grid-template-columns: repeat(1, 1fr);
 }
 
 .hobby-images img {
-    width: 100%; /* Szerokość dostosowana do kolumny */
-    aspect-ratio: 4 / 5; /* Proporcje prostokąta w pionie */
+    width: 100%;
+    aspect-ratio: 4 / 5;
     border-radius: 10px;
-    object-fit: cover; /* Przycięcie zdjęcia do prostokąta */
+    object-fit: cover;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -274,73 +277,93 @@ pre {
 }
 
 footer {
-    color: #F2F2F2; /* Kolor tekstu */
-    text-align: center; /* Wyśrodkowanie tekstu */
-    margin-top: auto; /* Przyklejenie stopki do dołu */
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Cień u góry stopki */
+    color: #F2F2F2;
+    text-align: center;
+    margin-top: auto;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+/* Dla ekranów o szerokości powyżej 480px */
+@media (min-width: 480px) {
+    .hobby-images {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .certificate-images {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .certificate-images img {
+        width: 45%;
+    }
 }
 
-/* Responsywność */
-@media (max-width: 768px) {
+/* Dla ekranów o szerokości powyżej 768px */
+@media (min-width: 768px) {
+    .profile-img {
+        max-width: 300px; /* Zwiększ rozmiar zdjęcia */
+    }
+
+    header h1 {
+        font-size: 2.5rem;
+    }
+
+    nav ul {
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+    }
+
     .intro-content {
-        flex-direction: column;
-        text-align: center;
+        flex-direction: row;
+        text-align: left;
     }
 
     .intro-image {
-        order: -1;
-        margin-bottom: 20px;
-    }
-
-    h2 {
-        text-align: center;
-    }
-
-    .hobby-images {
-        grid-template-columns: repeat(2, minmax(150px, 1fr)); /* 2 kolumny na mniejszych ekranach */
-    }
-
-    .interest-item, .hobby-item {
-        padding: 15px;
-    }
-
-    .interest-item h3, .hobby-item h3 {
-        font-size: 1.3rem;
-    }
-
-    .interest-item p, .hobby-item p {
-        font-size: 1rem;
-    }
-}
-
-@media (min-width: 768px) {
-    nav ul {
-        justify-content: flex-end;
+        order: 0;
+        margin-bottom: 0;
     }
 
     .project-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .hobby-images {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .interest-item, .hobby-item {
+        padding: 20px;
+    }
+
+    .interest-item h3, .hobby-item h3 {
+        font-size: 1.5rem;
+    }
+
+    .interest-item p, .hobby-item p {
+        font-size: 1.1rem;
+    }
 }
 
+/* Dla ekranów o szerokości powyżej 1024px */
 @media (min-width: 1024px) {
+    .profile-img {
+        max-width: 300px; /* Jeszcze większe zdjęcie */
+    }
+
+    header h1 {
+        font-size: 3rem;
+    }
+
     .project-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-}
 
-@media (max-width: 768px) {
-    .certificate-images {
-        flex-direction: column; /* Zdjęcia jedno pod drugim */
+    .hobby-images {
+        grid-template-columns: repeat(4, 1fr);
     }
 
     .certificate-images img {
-        width: 80%; /* Większa szerokość na mniejszych ekranach */
-    }
-}
-
-@media (max-width: 480px) {
-    .hobby-images {
-        grid-template-columns: repeat(1, minmax(150px, 1fr)); /* 1 kolumna na bardzo małych ekranach */
+        width: 30%;
     }
 }
