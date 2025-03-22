@@ -27,6 +27,15 @@ print(f"Test Loss: {test_loss}, Test Accuracy: {test_acc}")
 y_pred = model.predict(x_test)
 y_pred_classes = np.argmax(y_pred, axis=1)
 
+plt.figure(figsize=(10, 5))
+for i in range(10):
+    plt.subplot(2, 5, i + 1)
+    plt.imshow(x_test[i].reshape(28, 28), cmap='gray')
+    plt.title(f"P: {y_pred_classes[i]}, T: {y_test[i]}")
+    plt.axis('off')
+
+plt.show()
+
 # Calculate metrics: recall and precision
 print("\nClassification Report:\n")
 print(classification_report(y_test, y_pred_classes))
