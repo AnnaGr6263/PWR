@@ -20,7 +20,7 @@ num_classes = 10
 f, ax = plt.subplots(1, num_classes, figsize=(20, 20))
 
 for i in range(0, num_classes):
-     # Retrieve the first image for each class
+    # Retrieve the first image for each class
     sample = x_train[y_train == i][0]
     ax[i].imshow(sample, cmap='gray')
     ax[i].set_title('Label: {}'.format(i), fontsize=16)

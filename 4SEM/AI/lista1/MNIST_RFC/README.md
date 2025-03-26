@@ -4,20 +4,20 @@
 
 The goal of this project was to implement a digit classification model using the **Random Forest algorithm** from the `scikit-learn` library. The model was trained and tested on the **MNIST dataset**, which contains grayscale images of handwritten digits from 0 to 9.
 
-Random Forest is an ensemble learning method that operates by constructing multiple decision trees and outputting the class that is the mode of the classes predicted by individual trees. It is robust, fast, and performs well on classification tasks like image recognition.
+Random Forest is an ensemble learning method that constructs multiple decision trees and outputs the class that is the majority vote of those trees. It is robust, interpretable, and performs well on classification tasks like image recognition.
 
 ---
 
 ## Dataset: MNIST
 
-- **Size:** 70,000 total samples
+- **Total samples:** 70,000
   - 60,000 training images
   - 10,000 test images
 - **Image shape:** 28×28 pixels
 - **Classes:** 10 (digits from 0 to 9)
-- **Grayscale:** Values in the range [0, 255]
+- **Grayscale values:** 0–255
 
-Each image was flattened to a 784-length vector (28×28) before feeding into the classifier.
+Each image was flattened to a 784-length vector (28×28) before being used as input to the model.
 
 ---
 
@@ -29,7 +29,7 @@ Each image was flattened to a 784-length vector (28×28) before feeding into the
 - **Criterion:** Gini impurity
 - **Random state:** 1
 
-The model was trained using the full training set and evaluated on the full test set without any additional preprocessing or dimensionality reduction.
+The model was trained using the full training set without any additional preprocessing (e.g. PCA, scaling).
 
 ---
 
@@ -37,7 +37,9 @@ The model was trained using the full training set and evaluated on the full test
 
 ### Accuracy
 
-The trained model achieved an overall accuracy of **97.04%** on the MNIST test set.
+The trained model achieved an overall test accuracy of:
+
+**97.04% on the MNIST test set**
 
 ### Classification Report
 
@@ -58,12 +60,27 @@ The trained model achieved an overall accuracy of **97.04%** on the MNIST test s
 ---
 
 ## Confusion Matrix
-![Matrix](results/Matrix.png)
-## Predictions
-![Predictions](results/Prediction.png)
+
+![Confusion Matrix](results/matrix.png)
+
+---
+
+## Sample Predictions
+
+![Predictions](results/prediction.png)
+
+---
+
 ## Conclusions
-- The Random Forest classifier achieved **very high accuracy (97.04%)**, showing strong performance on the MNIST dataset.
-- Precision, recall, and F1-scores were consistently high across all digit classes.
 
+- The Random Forest classifier achieved **very high accuracy (97.04%)** on the MNIST dataset.
+- It performed consistently well across all digits, with precision and recall values above 95% for each class.
+- While not as sophisticated as deep learning models, Random Forest still demonstrates excellent performance for this classification task with minimal preprocessing.
 
+---
 
+## Potential Improvements
+
+- Test the model on custom handwritten digits for real-world generalization.
+- Apply dimensionality reduction (e.g., PCA) to reduce training time.
+- Compare performance with other classical models (e.g., SVM, k-NN).
