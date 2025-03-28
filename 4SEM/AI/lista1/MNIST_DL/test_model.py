@@ -20,13 +20,16 @@ model = load_model("mnist_model.h5")
 print("Model loaded.")
 
 # Evaluate the model on the test dataset
+# change to use one-hot encoding - vector of size 10 with 1 at the index of the label
 test_loss, test_acc = model.evaluate(x_test, keras.utils.to_categorical(y_test, 10))
 print(f"Test Loss: {test_loss}, Test Accuracy: {test_acc}")
 
-# Predict classes for the test dataset
+# Predict classes for the test dataset - returns a 10-element vector with probabilities for each class
 y_pred = model.predict(x_test)
+# Get the class with the highest probability
 y_pred_classes = np.argmax(y_pred, axis=1)
 
+# Display 10 random test images along with their true and predicted labels
 plt.figure(figsize=(10, 5))
 for i in range(10):
     plt.subplot(2, 5, i + 1)

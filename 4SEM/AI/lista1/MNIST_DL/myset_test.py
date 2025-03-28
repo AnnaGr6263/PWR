@@ -20,7 +20,7 @@ true_labels = []
 
 # Load each file in the folder
 for filename in os.listdir(test_folder):
-    if filename.endswith(".png"):  # Ensure only PNG files are loaded
+    if filename.endswith(".png"):  # only PNG files are loaded
         # Read the label from the filename (e.g., "3.1.png" -> digit 3)
         label = int(filename.split(".")[0])
         

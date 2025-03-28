@@ -4,7 +4,7 @@ import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 
-# Setting random seed for reproducibility
+# Setting random seed for reproducibility 
 np.random.seed(0)
 
 # Loading data from the MNIST dataset
@@ -29,7 +29,7 @@ for i in range(0, num_classes):
 for i in range (10):
     print(y_train[i])
     
-# Convert labels to one-hot encoding
+# Convert labels to one-hot encoding - vector of size 10 with 1 at the index of the label
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
@@ -47,9 +47,13 @@ print(x_train.shape)
 
 # Creating the model
 model = Sequential()
+# first layer with 128 neurons and ReLU activation function
 model.add(Dense(units=128,input_shape=(784,), activation='relu'))
+# second layer with 128 neurons and ReLU activation function
 model.add(Dense(units=128, activation='relu'))
+# Dropout layer to prevent overfitting
 model.add(Dropout(0.25))
+# output layer with 10 neurons and softmax activation function
 model.add(Dense(units=10, activation='softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -58,7 +62,7 @@ model.summary() # Print model summary
 # Train Model
 batch_size = 512 # number of samples in one batch
 epochs = 10 # Number of epochs - full passes through the training data
-model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=epochs)
+model.fit(x=x_train, y=y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
 
 model.save("mnist_model.h5")
 print("Model saved as 'mnist_model.h5'")

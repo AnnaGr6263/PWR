@@ -29,8 +29,6 @@ Each image was flattened to a 784-length vector (28×28) before being used as in
 - **Criterion:** Gini impurity
 - **Random state:** 1
 
-The model was trained using the full training set without any additional preprocessing (e.g. PCA, scaling).
-
 ---
 
 ## Results
@@ -55,7 +53,7 @@ The trained model achieved an overall test accuracy of:
 | 7     | 0.9715    | 0.9630 | 0.9673   | 1028    |
 | 8     | 0.9607    | 0.9538 | 0.9572   | 974     |
 | 9     | 0.9541    | 0.9485 | 0.9513   | 1009    |
-| **Average** | **0.9702** | **0.9702** | **0.9702** | **10,000** |
+| **Average  Total** | **0.9702** | **0.9702** | **0.9702** | **10,000** |
 
 ---
 
@@ -82,5 +80,3 @@ The trained model achieved an overall test accuracy of:
 ## Potential Improvements
 
 - Test the model on custom handwritten digits for real-world generalization.
-- Apply dimensionality reduction (e.g., PCA) to reduce training time.
-- Compare performance with other classical models (e.g., SVM, k-NN).

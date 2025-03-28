@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
 from keras.datasets import mnist
 import joblib
-from sklearn.ensemble import RandomForestClassifier  # Required for loading the model
+from sklearn.ensemble import RandomForestClassifier  
 import random
 
 # Load the pre-trained Random Forest model
 forest = joblib.load('random_forest_model.pkl')
 print("Random Forest model loaded.")
 
-# Load the MNIST test dataset
+# Load the MNIST test dataset 
 (_, _), (x_test, y_test) = mnist.load_data()
 
 # Reshape the test dataset from 28x28 images to 1D arrays of size 784
