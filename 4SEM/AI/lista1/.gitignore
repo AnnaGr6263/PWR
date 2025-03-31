@@ -1,0 +1,5 @@
+# Wszystkie pliki .h5 i .pkl w projekcie
+*.h5
+*.pkl
+*.joblib
+
