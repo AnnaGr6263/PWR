@@ -25,11 +25,15 @@ void insert(CyclicList &list, int value) {
     newNode->data = value;
 
     if (!list.any) { // Jeśli lista jest pusta
-        newNode->next = newNode; // Wskaźnik na samego siebie (cykliczność)
-        list.any = newNode;
+        newNode->next = newNode; 
+        list.any = newNode; 
     } else { 
-        newNode->next = list.any->next; 
-        list.any->next = newNode; 
+        Node* temp = list.any;
+        while (temp->next != list.any) { // Znajdujemy ostatni element
+            temp = temp->next;
+        }
+        temp->next = newNode; // Podpinamy nowy element na końcu listy
+        newNode->next = list.any; // Nowy ostatni element wskazuje na początek
     }
     list.size++;
 }
@@ -81,7 +85,7 @@ int search(CyclicList& list, int value) {
     
     do {
         comparisons++;
-        if (temp->data == value) {
+        if (temp->data == value) { // Znaleziono
             return comparisons;
         }
         temp = temp->next;
@@ -91,6 +95,19 @@ int search(CyclicList& list, int value) {
 }
 
 int main() {
+
+    // Tworzenie nowej listy
+    CyclicList list3;
+
+    // Wstawianie liczb od 1 do 10
+    for (int i = 1; i <= 10; i++) {
+        insert(list3, i);
+    }
+   
+    // Wypisanie zawartości listy
+    std::cout << "Lista 3 po wstawieniu elementów: ";
+    print(list3);
+   
     std::srand(std::time(0)); // Inicjalizacja generatora liczb losowych
 
     // Część 1: Tworzenie i scalanie dwóch list cyklicznych
@@ -122,7 +139,7 @@ int main() {
 
     // Generowanie tablicy T i wstawianie do listy L
     for (int i = 0; i < T_SIZE; i++) {
-        T[i] = std::rand() % VALUE_RANGE;
+        T[i] = std::rand() % VALUE_RANGE; 
         insert(L, T[i]);
     }
 

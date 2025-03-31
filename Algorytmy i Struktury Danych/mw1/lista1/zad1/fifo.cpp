@@ -32,8 +32,8 @@ public:
         if (!tail) { // Jeśli kolejka jest pusta
             head = tail = newNode;
         } else {
-            tail->next = newNode;
-            tail = newNode;
+            tail->next = newNode; // Podpięcie nowego węzła do końca kolejki
+            tail = newNode; // Nowy węzeł staje się nowym końcem kolejki
         }
 
         std::cout << "Dodano do kolejki: " << value << std::endl;

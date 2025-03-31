@@ -30,11 +30,11 @@ void insert(DoublyCyclicList &list, int value) {
         newNode->prev = newNode;
         list.any = newNode;
     } else {
-        Node* last = list.any->prev;
-        newNode->next = list.any;
-        newNode->prev = last;
-        last->next = newNode;
-        list.any->prev = newNode;
+        Node* last = list.any->prev; // Znajdujemy ostatni element listy
+        newNode->next = list.any; // Nowy węzeł wskazuje na początek listy
+        newNode->prev = last; // Nowy węzeł wskazuje na poprzedni element
+        last->next = newNode; 
+        list.any->prev = newNode; // Poprzedni element wskazuje na nowy węzeł
     }
     list.size++;
 }
@@ -46,14 +46,15 @@ void merge(DoublyCyclicList& list1, DoublyCyclicList& list2) {
     } else if (!list2.any) {
         return;
     } else {
-        Node* last1 = list1.any->prev;
-        Node* last2 = list2.any->prev;
+        // Znajdujemy ostatnie elementy obu list
+        Node* last1 = list1.any->prev; 
+        Node* last2 = list2.any->prev; 
+
+        last1->next = list2.any; // Ostatni element listy 1 wskazuje na początek listy 2
+        list2.any->prev = last1; // Początek listy 2 wskazuje na ostatni element listy 1
         
-        last1->next = list2.any;
-        list2.any->prev = last1;
-        
-        last2->next = list1.any;
-        list1.any->prev = last2;
+        last2->next = list1.any; // Ostatni element listy 2 wskazuje na początek listy 1
+        list1.any->prev = last2; // Początek listy 1 wskazuje na ostatni element listy 2
     }
     list1.size += list2.size;
     list2.any = nullptr;
@@ -94,6 +95,19 @@ int search(DoublyCyclicList& list, int value) {
 }
 
 int main() {
+
+        // Tworzenie nowej listy
+        DoublyCyclicList list3;
+
+        // Wstawianie liczb od 1 do 10
+        for (int i = 1; i <= 10; i++) {
+            insert(list3, i);
+        }
+       
+        // Wypisanie zawartości listy
+        std::cout << "Lista 3 po wstawieniu elementów: ";
+        print(list3);
+       
     std::srand(std::time(0));
 
     // Tworzenie i scalanie dwóch list
